@@ -71,23 +71,51 @@ for i in range(56):
     jumlah_kata[indeks_terbesar] = -1
 
 print(data_terbanyak)
-
 #---------------------------------------------------------------------------------------
+# Membuat urutan berdasarkan huruf
 
+data_kata = ""
+
+# Memasukan data ke dalam string untuk diambil katanya saja
+for i in range(56*2):
+    if i % 2 == 0:
+        data_kata += " " + data_terbanyak[i]
+    
+# Mengurutkan kata berdasar abjad dalam bentuk list
+data_kata = data_kata.split()
+data_kata.sort()
+
+print(data_kata)
+
+# Menginisasi isi data final
+data_final = []
+
+# Membuat model data final dari kata yang sudah diurutkan beserta jumlahnya
+for kata in data_kata:
+    # Cek
+    indeks_kata = data_terbanyak.index(kata)
+
+    data_final.append(kata)
+    data_final.append(data_terbanyak[indeks_kata + 1])
+
+print(data_final)
+
+# Membuat file html----------------------------------------------------------------------
 keluaran = ""
 body = ""
 data_count = []
 
-for i in range(len(data_terbanyak)):
+for i in range(len(data_final)):
     if i % 2 == 1:
-        data_count.append(data_terbanyak[i])
+        data_count.append(data_final[i])
 
 print(data_count)
 
 hitung_program =  0
 while hitung_program < 56*2:
-    word = data_terbanyak[hitung_program]
-    cnt = float(data_terbanyak[hitung_program + 1])
+    # Mencari atribut dengan pencarian nilai yang ada
+    word = data_final[hitung_program]
+    cnt = float(data_final[hitung_program + 1])
     high_count =float(max(data_count))
     low_count = float(min(data_count))
 
@@ -97,7 +125,6 @@ while hitung_program < 56*2:
 
 body = html_functions.make_HTML_box(body)
 keluaran = html_functions.print_HTML_file(body, "A Word Cloud of "+file_masukan)
-
 
 # WRITE TO FILE OUTPUT
 my_file = open(file_keluaran, mode='w')
