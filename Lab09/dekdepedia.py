@@ -22,15 +22,16 @@ class User() :
         return self.__tipe
 
 class Seller(User) : 
+    
     def __init__(self, user_name, pemasukan, list_barang_jual):
-        self.user_name = user_name
+        super().__init__(user_name, "SELLER")
         self.__pemasukan = pemasukan
         self.list_barang_jual = list_barang_jual
         # TODO : implementasikan constructor dari class Seller
 
     # TODO : lengkapi getter dan setter
     @property
-    def pemasukan(self) : 
+    def pemasukan(self): 
         pass
 
     @pemasukan.getter
@@ -43,8 +44,8 @@ class Seller(User) :
  
     # TODO : implementasikan method untuk tambahkan_produk dan lihat_daftar_produk_saya
     # Anda boleh memodifikasi ataupun menambahkan method sesuai dengan kebutuhan
-    def tambah_product(self) :
-        self.list_barang_jual.append(input())
+    def tambah_product(self, data_produk) :
+        self.list_barang_jual.append(data_produk)
 
     def lihat_produk_jualan_saya(self) : 
         print("\nBerikut merupakan barang jualan saya")
@@ -52,20 +53,25 @@ class Seller(User) :
         print("  Nama Product  |   Harga   | Stock ")
         print("-------------------------------------")
         for product in self.list_barang_jual : 
+            nama_produk = product[0]
+            harga = product[1]
+            stock = product[2]
             # TODO : cetak tiap product dengan urutan alphabetical
             # dengan format : nama product 16 spaces + "|" + harga product 11 spaces + "|" + stok 7 spaces
-            pass
+            print(f"{nama_produk:<16}|{harga:<11}|{stock:<7}")
+
         print("-------------------------------------\n")
 
     def menu(self) : 
         # TODO : implementaiskan menu untuk tipe user seller
-        print(f"Selamat datang {self.user_name},")
+        print(f"Selamat datang {self.get_name},")
         print("berikut menu yang bisa Anda lakukan:")
         print("1. TAMBAHKAN_PRODUK")
         print("2. LIHAT_DAFTAR_PRODUK_SAYA")
         print("3. LOG_OUT")
         print()
-        print(f"Pemasukan anda {self.pemasukan},")
+        print(f"Pemasukan anda {self.get_pemasukan},")
+
 
 # TODO : implementasikan class Buyer
 class Buyer(User) : 
@@ -170,6 +176,21 @@ def sign_up(banyak_user):
 
     return list_user
 
+def seller_menu(user_logged_in):
+    while True:
+        # Memanggil method menu dari class seller
+        Seller.menu(user_logged_in)
+        
+        perintah = input("Apa yang ingin Anda lakukan? ")
+        if perintah == "1":
+            data_produk = input("Masukkan data produk : ").split() # azuz 10000 1
+            user_logged_in.tambah_product(data_produk)
+        elif perintah == "2":
+            user_logged_in.lihat_produk_jualan_saya()
+        elif perintah == "3":
+            print(f"Anda telah keluar dari akun {user_logged_in.get_name}\n")
+            break
+
 def main():
     while True:
         print("Selamat datang di Dekdepedia!")
@@ -188,40 +209,46 @@ def main():
             print(list_user)
             # Inisiasi object berdasarkan list
             lst_obj = []
+            lst_sel = []
+            lst_buy = []
             for user, data in list_user.items():
                 user_tipe = data[0]
                 lst_obj.append(User(user, user_tipe))
+                if user_tipe == "SELLER":
+                    lst_sel.append(Seller(user, 0, [])) #user_name, pemasukan, listbarang
+                # elif user_tipe == "BUYER":
+                    # lst_buy.append(Buyer(user))
 
+
+            # ADA 3 LST OBJECT USER, SELLER, BUYER
             print(lst_obj)
+            print(lst_sel)
+            print(lst_buy)
 
         elif (pilih == "2") : 
             user_name_login = input("user_name : ")
             if user_name_login in list_user.keys():
                 
-                # Mengambil address object
+                # Mengambil address object User
                 user_logged_in = get_user(user_name_login, lst_obj)
                 print(user_logged_in)
 
                 # Validasi data pengguna
                 print(f"Anda telah masuk dalam akun {user_logged_in.get_name} sebagai {user_logged_in.get_tipe}\n")
                 
+                # user_logged_in masih dalam User class
                 if user_logged_in.get_tipe == "SELLER":
+                    # Mengambil address object Seller
+                    user_logged_in = get_user(user_name_login, lst_sel)
+                    print(user_logged_in)
+
                     # BUAT NGECEK DOANG (masih di User classnya)
                     print(user_logged_in.get_name)
                     print(user_logged_in.get_tipe)
                     # obj = lst_obj
                     # user_logged_in = Seller(user_name_login, )
 
-                    while True:
-                        user_name_login.menu()
-                        perintah = input("Apa yang ingin Anda lakukan? ")
-                        if perintah == "1":
-                            data_produk = input("Masukkan data produk : ") # azuz 10000 1
-                        elif perintah == "2":
-                            Seller.lihat_produk_jualan_saya()
-                        elif perintah == "3":
-                            print(f"Anda telah keluar dari akun {user_name_login}")
-                            break
+                    seller_menu(user_logged_in)
 
             else:
                 print(f"Akun dengan user_name {user_name_login} tidak ditemukan\n")
