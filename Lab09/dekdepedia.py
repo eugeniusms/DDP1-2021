@@ -1,8 +1,6 @@
 lst_toko = []
 lst_sel = []
 
-# ASCENDING TOKO, PEMBELI, PENJUAL
-
 class User() :
     def __init__(self, user_name, tipe):
         self.__user_name = user_name
@@ -178,6 +176,30 @@ class Product() :
         print("------------------------------------------------\n")
 
 
+# Mengurutkan isi barang berdasarkan abjad
+def sorting_lst(lst_obj, account = ""):
+    new_lst = []
+    send_lst = []
+    # Untuk obj di dalam list non obj (lst_toko)
+    try:
+        # Mengeluarkan obj dulu
+        for obj in lst_obj:
+            new_lst.append([obj.nama, obj.harga, obj.stock, obj.seller])
+        
+        print(f"NEHHHH {new_lst}")
+
+        new_lst = sorted(new_lst,key=lambda l:l[0])
+
+        # Back into obj again
+        for nonobj in new_lst:
+            isi = Product(nonobj[0], nonobj[1], nonobj[2], nonobj[3])
+            send_lst.append(isi)
+
+    except AttributeError:
+        # Untuk normal di dalam list obj
+        send_lst = sorted(lst_obj,key=lambda l:l[0])
+        
+    return send_lst
 
 # method get_user dan get_product tidak perlu diubah, 
 # silakan manfaatkan method ini untuk mendapatkan user dan produk yang dibutuhkan
@@ -196,7 +218,6 @@ def get_product(name, lst_toko):
     for product in lst_toko:
         if product.nama == name:
             return product
-
 
 def sign_up(banyak_user):
     """
@@ -288,6 +309,7 @@ def seller_menu(user_logged_in):
             lst_toko.append(new_product)
 
         elif perintah == "2":
+            user_logged_in.list_barang_jual = sorting_lst(user_logged_in.list_barang_jual)
             user_logged_in.lihat_produk_jualan_saya()
         elif perintah == "3":
             print(f"Anda telah keluar dari akun {user_logged_in.get_name}\n")
@@ -305,6 +327,7 @@ def buyer_menu(user_logged_in):
 
         perintah = input("Apa yang ingin Anda lakukan? ")
         if perintah == "1":
+            lst_toko = sorting_lst(lst_toko)
             Product.toko_view(lst_toko)
 
         elif perintah == "2":
@@ -342,6 +365,7 @@ def buyer_menu(user_logged_in):
 
 
         elif perintah == "3": # Riwayat Pembelian
+            user_logged_in.list_barang_beli = sorting_lst(user_logged_in.list_barang_beli)
             user_logged_in.lihat_produk_saya_beli()
 
         elif perintah == "4":
