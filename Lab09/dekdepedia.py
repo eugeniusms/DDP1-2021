@@ -88,7 +88,7 @@ class Seller(User) :
             # dengan format : nama product 16 spaces + "|" + harga product 11 spaces + "|" + stok 7 spaces
             print(f"{nama_produk:<16}|{harga:<11}|{stock:<7}")
 
-        print("-------------------------------------\n")
+        print("-------------------------------------")
 
     def menu(self) : 
         # TODO : implementaiskan menu untuk tipe user seller
@@ -97,7 +97,6 @@ class Seller(User) :
         print("1. TAMBAHKAN_PRODUK")
         print("2. LIHAT_DAFTAR_PRODUK_SAYA")
         print("3. LOG_OUT")
-        print()
 
 
 # TODO : implementasikan class Buyer
@@ -136,7 +135,7 @@ class Buyer(User) :
             # dengan format : nama product 16 spaces + "|" + harga product 11 spaces + "|" + stok 7 spaces
             print(f"{nama_produk:<16}|{harga:<11}|{seller:<7}")
 
-        print("-------------------------------------\n")
+        print("-------------------------------------")
 
     def menu(self):
         print(f"Selamat datang {self.get_name},")
@@ -145,7 +144,6 @@ class Buyer(User) :
         print("2. BELI_PRODUK")
         print("3. RIWAYAT_PEMBELIAN_SAYA")
         print("4. LOG_OUT")
-        print()
 
 
 # TODO : implementasikan class Product
@@ -173,7 +171,7 @@ class Product() :
             # dengan format : nama product 16 spaces + "|" + harga product 11 spaces + "|" + stok 7 spaces
             print(f"{nama_produk:<16}|{harga:<11}|{stock:<7}|{seller}")
 
-        print("------------------------------------------------\n")
+        print("------------------------------------------------")
 
 
 # Mengurutkan isi barang berdasarkan abjad
@@ -286,22 +284,31 @@ def sign_up(banyak_user):
 
 def seller_menu(user_logged_in):
     global lst_toko
-    while True:
-        # Memanggil method menu dari class seller
-        Seller.menu(user_logged_in)
+    # Memanggil method menu dari class seller
+    Seller.menu(user_logged_in)
 
+    while True:
         # Print pemasukan
-        print(f"Pemasukan anda {user_logged_in.get_pemasukan},")
+        print(f"\nPemasukan anda {user_logged_in.get_pemasukan},")
         perintah = input("Apa yang ingin Anda lakukan? ")
         if perintah == "1":
             data_produk = input("Masukkan data produk : ").split() # azuz 10000 1
+            # Cek apakah produk pernah terdaftar belum, jika sudah dicontinue
+            nama_produk = data_produk[0]
+            cek_terdaftar = 0
+            for produk in lst_toko:  
+                if nama_produk == produk.nama:
+                    print("Produk sudah pernah terdaftar.\n")
+                    cek_terdaftar += 1 
+            if cek_terdaftar > 0:
+                continue
+
             # Membuat stock dan harga dari string menjadi integer agar bisa dioperasikan
             data_produk[1] = int(data_produk[1])
             data_produk[2] = int(data_produk[2])
             # Dikirim ke seller class
             user_logged_in.tambah_product(data_produk)
             # Dikirim ke product class
-            nama_produk = data_produk[0]
             harga = int(data_produk[1])
             stock = int(data_produk[2])
             seller = user_logged_in.get_name
@@ -320,10 +327,11 @@ def seller_menu(user_logged_in):
 
 def buyer_menu(user_logged_in):
     global lst_toko, lst_sel
+    # Memanggil method menu dari class buyer
+    Buyer.menu(user_logged_in)
+
     while True:
-        # Memanggil method menu dari class buyer
-        Buyer.menu(user_logged_in)
-        print(f"Saldo anda {user_logged_in.get_saldo},")
+        print(f"\nSaldo anda {user_logged_in.get_saldo},")
 
         perintah = input("Apa yang ingin Anda lakukan? ")
         if perintah == "1":
@@ -332,13 +340,24 @@ def buyer_menu(user_logged_in):
 
         elif perintah == "2":
             barang_beli = input("Masukkan barang yang ingin dibeli : ")
+            # Cek validasi
+            cek_terdaftar = 0
+            # Mengecek keberadaan barang
+            for produk in lst_toko:  
+                if barang_beli == produk.nama:
+                    cek_terdaftar += 1 
+
+            if cek_terdaftar < 1:
+                print(f"Barang dengan nama {barang_beli} tidak ditemukan dalam Dekdepedia.\n")
+                continue
+
             barang_beli = get_product(barang_beli, lst_toko)
             # Pemanggilan produk
             nama = barang_beli.nama
             harga = barang_beli.harga
             stock = barang_beli.stock
             seller = barang_beli.seller
-            # Cek validasi
+            
             if stock < 1:
                 print("Maaf, stok produk telah habis.\n")
                 continue
@@ -356,7 +375,7 @@ def buyer_menu(user_logged_in):
                 # Mengirimkan uang ke rekening penjual
                 user_seller_in.set_pemasukan = user_seller_in.get_pemasukan + harga
                 # Print berhasil
-                print(f"Berhasil membeli {nama} dari {seller}\n")
+                print(f"Berhasil membeli {nama} dari {seller}")
                 
                 # Memasukkan dalam catatan riwayat beli
                 data_produk = [nama, int(harga), seller]
@@ -440,9 +459,6 @@ def main():
                     print(user_logged_in)
 
                     buyer_menu(user_logged_in)
-
-                    
-
 
             else:
                 print(f"Akun dengan user_name {user_name_login} tidak ditemukan\n")
