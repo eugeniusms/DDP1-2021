@@ -1,4 +1,7 @@
 lst_toko = []
+lst_sel = []
+
+# ASCENDING TOKO, PEMBELI, PENJUAL
 
 class User() :
     def __init__(self, user_name, tipe):
@@ -32,6 +35,7 @@ class Seller(User) :
         # TODO : implementasikan constructor dari class Seller
 
     # TODO : lengkapi getter dan setter
+    # Getter dan Setter untuk pemasukan
     @property
     def pemasukan(self): 
         pass
@@ -43,18 +47,42 @@ class Seller(User) :
     @pemasukan.setter
     def set_pemasukan(self, input):
         self.__pemasukan = input 
- 
+
+    """
+    # Getter dan Setter untuk list barang dijual
+    @property
+    def list_barang_jual(self): 
+        pass
+
+    @list_barang_jual.getter
+    def get_barang(self):
+        return self.list_barang_jual
+
+    @list_barang_jual.setter
+    def set_barang(self, input):
+        self.list_barang_jual = input
+    """
+    
     # TODO : implementasikan method untuk tambahkan_produk dan lihat_daftar_produk_saya
     # Anda boleh memodifikasi ataupun menambahkan method sesuai dengan kebutuhan
     def tambah_product(self, data_produk) :
         self.list_barang_jual.append(data_produk)
+
+    # Mengurang stok
+    def kurangi_product(self, produk_dibeli):
+        for i in range(len(self.list_barang_jual)):
+            nama_produk = self.list_barang_jual[i][0]
+            if nama_produk == produk_dibeli:
+                # Index 2 adalah stock
+                print(f"PRODUK DIBELI BROU : {nama_produk}")
+                self.list_barang_jual[i][2] -= 1
 
     def lihat_produk_jualan_saya(self) : 
         print("\nBerikut merupakan barang jualan saya")
         print("-------------------------------------")
         print("  Nama Product  |   Harga   | Stock ")
         print("-------------------------------------")
-        for product in self.list_barang_jual : 
+        for product in self.list_barang_jual: 
             nama_produk = product[0]
             harga = product[1]
             stock = product[2]
@@ -72,7 +100,6 @@ class Seller(User) :
         print("2. LIHAT_DAFTAR_PRODUK_SAYA")
         print("3. LOG_OUT")
         print()
-        print(f"Pemasukan anda {self.get_pemasukan},")
 
 
 # TODO : implementasikan class Buyer
@@ -98,6 +125,21 @@ class Buyer(User) :
     def beli_product(self, data_produk) :
         self.list_barang_beli.append(data_produk)
 
+    def lihat_produk_saya_beli(self) : 
+        print("\nBerikut merupakan barang yang saya beli")
+        print("-------------------------------------")
+        print("  Nama Product  |   Harga   | Penjual ")
+        print("-------------------------------------")
+        for product in self.list_barang_beli: 
+            nama_produk = product[0]
+            harga = product[1]
+            seller= product[2]
+            # TODO : cetak tiap product dengan urutan alphabetical
+            # dengan format : nama product 16 spaces + "|" + harga product 11 spaces + "|" + stok 7 spaces
+            print(f"{nama_produk:<16}|{harga:<11}|{seller:<7}")
+
+        print("-------------------------------------\n")
+
     def menu(self):
         print(f"Selamat datang {self.get_name},")
         print("berikut menu yang bisa Anda lakukan:")
@@ -106,7 +148,6 @@ class Buyer(User) :
         print("3. RIWAYAT_PEMBELIAN_SAYA")
         print("4. LOG_OUT")
         print()
-        print(f"Saldo anda {self.get_saldo},")
 
 
 # TODO : implementasikan class Product
@@ -122,7 +163,6 @@ class Product() :
     def toko_view(self):
         global lst_toko
         print("Berikut merupakan daftar product di Dekdepedia")
-        print("------------------------------------------------")
         print("------------------------------------------------")
         print("  Nama Product  |   Harga   | Stock |  Penjual")
         print("------------------------------------------------")
@@ -149,17 +189,14 @@ def get_user(name, lst_obj):
         if user.get_name == name:
             return user
 
-def get_product(name):
+def get_product(name, lst_toko):
     """
     Method untuk mengembalikan product dengan name sesuai parameter
     """
-    for product in list_product:
-        if product.get_name() == name:
+    for product in lst_toko:
+        if product.nama == name:
             return product
-    return None
 
-list_user = []
-list_product = []
 
 def sign_up(banyak_user):
     """
@@ -231,10 +268,15 @@ def seller_menu(user_logged_in):
     while True:
         # Memanggil method menu dari class seller
         Seller.menu(user_logged_in)
-        
+
+        # Print pemasukan
+        print(f"Pemasukan anda {user_logged_in.get_pemasukan},")
         perintah = input("Apa yang ingin Anda lakukan? ")
         if perintah == "1":
             data_produk = input("Masukkan data produk : ").split() # azuz 10000 1
+            # Membuat stock dan harga dari string menjadi integer agar bisa dioperasikan
+            data_produk[1] = int(data_produk[1])
+            data_produk[2] = int(data_produk[2])
             # Dikirim ke seller class
             user_logged_in.tambah_product(data_produk)
             # Dikirim ke product class
@@ -255,21 +297,59 @@ def seller_menu(user_logged_in):
     print(lst_toko)
 
 def buyer_menu(user_logged_in):
-    global lst_toko
+    global lst_toko, lst_sel
     while True:
-        # Memanggil method menu dari class seller
+        # Memanggil method menu dari class buyer
         Buyer.menu(user_logged_in)
-        
+        print(f"Saldo anda {user_logged_in.get_saldo},")
+
         perintah = input("Apa yang ingin Anda lakukan? ")
         if perintah == "1":
             Product.toko_view(lst_toko)
+
         elif perintah == "2":
-            user_logged_in.lihat_produk_jualan_saya()
+            barang_beli = input("Masukkan barang yang ingin dibeli : ")
+            barang_beli = get_product(barang_beli, lst_toko)
+            # Pemanggilan produk
+            nama = barang_beli.nama
+            harga = barang_beli.harga
+            stock = barang_beli.stock
+            seller = barang_beli.seller
+            # Cek validasi
+            if stock < 1:
+                print("Maaf, stok produk telah habis.\n")
+                continue
+            elif harga > user_logged_in.get_saldo:
+                print(f"Maaf, saldo Anda tidak cukup untuk membeli {nama}\n")
+                continue
+            else:
+                # Mengurangi saldo user
+                user_logged_in.set_saldo = user_logged_in.get_saldo - harga
+                # Mengurangi stock jualan di akun penjual
+                user_seller_in = get_user(seller, lst_sel)
+                user_seller_in.kurangi_product(nama)
+                # Mengurangi stock jualan di marketplace
+                barang_beli.stock -= 1
+                # Mengirimkan uang ke rekening penjual
+                user_seller_in.set_pemasukan = user_seller_in.get_pemasukan + harga
+                # Print berhasil
+                print(f"Berhasil membeli {nama} dari {seller}\n")
+                
+                # Memasukkan dalam catatan riwayat beli
+                data_produk = [nama, int(harga), seller]
+                # Dikirim ke buyer class
+                user_logged_in.beli_product(data_produk)
+
+
+        elif perintah == "3": # Riwayat Pembelian
+            user_logged_in.lihat_produk_saya_beli()
+
         elif perintah == "4":
             print(f"Anda telah keluar dari akun {user_logged_in.get_name}\n")
             break
 
 def main():
+    global lst_sel
     while True:
         print("Selamat datang di Dekdepedia!")
         print("Silakan memilih salah satu menu di bawah:")
@@ -295,7 +375,8 @@ def main():
                 if user_tipe == "SELLER":
                     lst_sel.append(Seller(user, 0, [])) #user_name, pemasukan, listbarang
                 elif user_tipe == "BUYER":
-                    lst_buy.append(Buyer(user, 0, []))
+                    saldo_buyer = int(data[1])
+                    lst_buy.append(Buyer(user, saldo_buyer, []))
 
 
             # ADA 3 LST OBJECT USER, SELLER, BUYER
