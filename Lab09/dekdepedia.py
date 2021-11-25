@@ -45,21 +45,6 @@ class Seller(User) :
     @pemasukan.setter
     def set_pemasukan(self, input):
         self.__pemasukan = input 
-
-    """
-    # Getter dan Setter untuk list barang dijual
-    @property
-    def list_barang_jual(self): 
-        pass
-
-    @list_barang_jual.getter
-    def get_barang(self):
-        return self.list_barang_jual
-
-    @list_barang_jual.setter
-    def set_barang(self, input):
-        self.list_barang_jual = input
-    """
     
     # TODO : implementasikan method untuk tambahkan_produk dan lihat_daftar_produk_saya
     # Anda boleh memodifikasi ataupun menambahkan method sesuai dengan kebutuhan
@@ -72,7 +57,6 @@ class Seller(User) :
             nama_produk = self.list_barang_jual[i][0]
             if nama_produk == produk_dibeli:
                 # Index 2 adalah stock
-                print(f"PRODUK DIBELI BROU : {nama_produk}")
                 self.list_barang_jual[i][2] -= 1
 
     def lihat_produk_jualan_saya(self) : 
@@ -158,7 +142,7 @@ class Product() :
 
     def toko_view(self):
         global lst_toko
-        print("Berikut merupakan daftar product di Dekdepedia")
+        print("\nBerikut merupakan daftar product di Dekdepedia")
         print("------------------------------------------------")
         print("  Nama Product  |   Harga   | Stock |  Penjual")
         print("------------------------------------------------")
@@ -175,7 +159,7 @@ class Product() :
 
 
 # Mengurutkan isi barang berdasarkan abjad
-def sorting_lst(lst_obj, account = ""):
+def sorting_lst(lst_obj):
     new_lst = []
     send_lst = []
     # Untuk obj di dalam list non obj (lst_toko)
@@ -183,8 +167,6 @@ def sorting_lst(lst_obj, account = ""):
         # Mengeluarkan obj dulu
         for obj in lst_obj:
             new_lst.append([obj.nama, obj.harga, obj.stock, obj.seller])
-        
-        print(f"NEHHHH {new_lst}")
 
         new_lst = sorted(new_lst,key=lambda l:l[0])
 
@@ -280,6 +262,7 @@ def sign_up(banyak_user):
                 print("Akun tidak valid.")
                 continue
 
+    print()
     return list_user
 
 def seller_menu(user_logged_in):
@@ -323,7 +306,7 @@ def seller_menu(user_logged_in):
             break
 
     # Address isi toko
-    print(lst_toko)
+    # print(lst_toko)
 
 def buyer_menu(user_logged_in):
     global lst_toko, lst_sel
@@ -348,7 +331,7 @@ def buyer_menu(user_logged_in):
                     cek_terdaftar += 1 
 
             if cek_terdaftar < 1:
-                print(f"Barang dengan nama {barang_beli} tidak ditemukan dalam Dekdepedia.\n")
+                print(f"Barang dengan nama {barang_beli} tidak ditemukan dalam Dekdepedia.")
                 continue
 
             barang_beli = get_product(barang_beli, lst_toko)
@@ -359,10 +342,10 @@ def buyer_menu(user_logged_in):
             seller = barang_beli.seller
             
             if stock < 1:
-                print("Maaf, stok produk telah habis.\n")
+                print("Maaf, stok produk telah habis.")
                 continue
             elif harga > user_logged_in.get_saldo:
-                print(f"Maaf, saldo Anda tidak cukup untuk membeli {nama}\n")
+                print(f"Maaf, saldo Anda tidak cukup untuk membeli {nama}")
                 continue
             else:
                 # Mengurangi saldo user
@@ -400,14 +383,18 @@ def main():
         print("2. Log In")
         print("3. Exit")
 
+        # Validasi input
         pilih = input("Pilihan Anda: ")
+        if not pilih.isdigit():
+            print()
+            continue
 
         if (pilih == "1") : 
             banyak_user = int(input("Jumlah akun yang ingin didaftarkan : "))
             
             print("Data akun: ")
             list_user = sign_up(banyak_user)
-            print(list_user)
+            # print(list_user)
             # Inisiasi object berdasarkan list
             lst_obj = []
             lst_sel = []
@@ -423,9 +410,9 @@ def main():
 
 
             # ADA 3 LST OBJECT USER, SELLER, BUYER
-            print(lst_obj)
-            print(lst_sel)
-            print(lst_buy)
+            # print(lst_obj)
+            # print(lst_sel)
+            # print(lst_buy)
 
         elif (pilih == "2") : 
             user_name_login = input("user_name : ")
@@ -433,7 +420,7 @@ def main():
                 
                 # Mengambil address object User
                 user_logged_in = get_user(user_name_login, lst_obj)
-                print(user_logged_in)
+                # print(user_logged_in)
 
                 # Validasi data pengguna
                 print(f"Anda telah masuk dalam akun {user_logged_in.get_name} sebagai {user_logged_in.get_tipe}\n")
@@ -442,11 +429,11 @@ def main():
                 if user_logged_in.get_tipe == "SELLER":
                     # Mengambil address object Seller
                     user_logged_in = get_user(user_name_login, lst_sel)
-                    print(user_logged_in)
+                    # print(user_logged_in)
 
                     # BUAT NGECEK DOANG (masih di User classnya)
-                    print(user_logged_in.get_name)
-                    print(user_logged_in.get_tipe)
+                    # print(user_logged_in.get_name)
+                    # print(user_logged_in.get_tipe)
                     # obj = lst_obj
                     # user_logged_in = Seller(user_name_login, )
 
@@ -456,7 +443,7 @@ def main():
                 elif user_logged_in.get_tipe == "BUYER":
                     # Mengambil address object Seller
                     user_logged_in = get_user(user_name_login, lst_buy)
-                    print(user_logged_in)
+                    # print(user_logged_in)
 
                     buyer_menu(user_logged_in)
 
