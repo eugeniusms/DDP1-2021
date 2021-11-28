@@ -41,6 +41,7 @@ def count_words(filepath, stop_words):
     word_clear_punctuation = []
     word_clear = []
     doc_char_clear = ""
+    punc_mid = ["[", "]", "(", ")", "/"]
 
     
     # Membuka file kemudian membaca dan memasukkan isinya ke dalam variabel doc_char, lalu menutup file
@@ -64,8 +65,10 @@ def count_words(filepath, stop_words):
             if i == 0 or i == len(doc_char): # Handle error punctuation string pertama dan terakhir
                 continue
             if (doc_char[i] in string.punctuation) and (doc_char[i-1] not in string.punctuation) and (doc_char[i+1] not in string.punctuation):
-                if (doc_char[i-1] != " ") and (doc_char[i+1] != " "):
+                if (doc_char[i-1] != " ") and (doc_char[i+1] != " ") and (doc_char[i] not in punc_mid):
                     doc_char_clear += doc_char[i]
+
+    print(doc_char_clear)
 
     # Memecah dokumen baru yang bersih dari tanda baca menjadi list setiap kata 
     word_clear_punctuation = doc_char_clear.split()
