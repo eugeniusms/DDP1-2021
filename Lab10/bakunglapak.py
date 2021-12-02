@@ -48,31 +48,26 @@ class WindowLihatBarang(tk.Toplevel):
         self.create_widgets()
 
     def create_widgets(self):
-        self.lbl_judul = tk.Label(self, \
-                                  text = 'Daftar Barang Yang Tersedia').grid(row = 0, column = 1)
-        self.lbl_nama = tk.Label(self, \
-                                 text = 'Nama Produk').grid(row = 1, column = 0)
-        self.lbl_harga = tk.Label(self, \
-                                  text = 'Harga').grid(row = 1, column = 1)
-        self.lbl_stok = tk.Label(self, \
-                                 text = 'Stok Produk').grid(row = 1, column = 2)
+        self.lbl_judul = tk.Label(self, text = 'Daftar Barang Yang Tersedia').grid(row = 0, column = 1)
+        self.lbl_nama = tk.Label(self, text = 'Nama Produk').grid(row = 1, column = 0)
+        self.lbl_harga = tk.Label(self, text = 'Harga').grid(row = 1, column = 1)
+        self.lbl_stok = tk.Label(self, text = 'Stok Produk').grid(row = 1, column = 2)
 
         i = 2
         for nama, barang in sorted(self.product_dict.items()):
-            tk.Label(self, \
-                     text = f"{nama}").grid(row = i, column= 0)
-            tk.Label(self, \
-                     text = f"{barang.get_harga()}").grid(row = i, column= 1)
-            tk.Label(self, \
-                     text = f"{barang.get_stok()}").grid(row = i, column= 2)
+            tk.Label(self, text = f"{nama}").grid(row = i, column= 0)
+            tk.Label(self, text = f"{barang.get_harga()}").grid(row = i, column= 1)
+            tk.Label(self, text = f"{barang.get_stok()}").grid(row = i, column= 2)
             i += 1
 
         self.btn_exit = tk.Button(self, text = "EXIT", \
                                   command = self.destroy).grid(row = i, column=1)
 
 class WindowBeliBarang(tk.Toplevel):
-    def __init__(self, buyer, product_dict, master = None):
+    def __init__(self, buyer, product_dict, master = None, nama_barang = "", jumlah = 0):
         super().__init__(master)
+        self.ent_nama_barang = nama_barang
+        self.ent_jumlah = jumlah
         self.buyer = buyer
         self.product_dict = product_dict
         self.wm_title("Beli Barang")
@@ -83,20 +78,19 @@ class WindowBeliBarang(tk.Toplevel):
         # TODO: lengkapi method ini
         # self.ent_nama_barang = input('Nama Barang')
         # self.ent_jumlah = int(input('Jumlah'))
-        self.lbl_form = tk.Label(self, \
-                                text = 'Form Beli Barang').grid(row = 0, column = 1)
-        self.lbl_barang = tk.Label(self, \
-                                text = 'Nama Barang').grid(row = 1, column = 0)
-        self.ent_nama_barang = tk.Entry(self, \
-                                width = 25).grid(row = 1, column = 1)
-        self.lbl_jumlah= tk.Label(self, \
-                                text = 'Jumlah').grid(row = 2, column = 0)
-        self.ent_jumlah = tk.Entry(self, \
-                                width = 25).grid(row = 2, column = 1)
-        self.btn_beli = tk.Button(self, \
-                                       text = "BELI").grid(row = 3, column = 1)
-        self.btn_exit = tk.Button(self, \
-                                  text = "EXIT").grid(row = 4, column = 1)
+        self.lbl_form = tk.Label(self, text = 'Form Beli Barang').grid(row = 0, column = 1)
+        self.lbl_barang = tk.Label(self, text = 'Nama Barang').grid(row = 1, column = 0)
+
+        self.ent_nama_barang = tk.Entry(self, width = 25)
+        self.ent_nama_barang.grid(row = 1, column = 1)
+
+        self.lbl_jumlah= tk.Label(self, text = 'Jumlah').grid(row = 2, column = 0)
+
+        self.ent_jumlah = tk.Entry(self, width = 25)
+        self.ent_jumlah.grid(row = 2, column = 1)
+
+        self.btn_beli = tk.Button(self, text = "BELI", command = self.beli_barang).grid(row = 3, column = 1)
+        self.btn_exit = tk.Button(self, text = "EXIT", command = self.destroy).grid(row = 4, column = 1)
 
     def beli_barang(self):
         # TODO: lengkapi method ini, yang merupakan event handler untuk
@@ -131,7 +125,20 @@ class WindowCheckOut(tk.Toplevel):
 
     def create_widgets(self):
         # TODO: lengkapi method ini
-        pass
+        self.lbl_judul = tk.Label(self, text = 'Keranjangku').grid(row = 0, column = 1)
+        self.lbl_nama = tk.Label(self, text = 'Nama Produk').grid(row = 1, column = 0)
+        self.lbl_harga = tk.Label(self, text = 'Harga Barang').grid(row = 1, column = 1)
+        self.lbl_stok = tk.Label(self, text = 'Jumlah').grid(row = 1, column = 2)
+        
+        i = 2
+        for barang, jumlah in self.daftar_dibeli.items():
+            tk.Label(self, text = f"{barang.get_nama()}").grid(row = i, column= 0)
+            tk.Label(self, text = f"{barang.get_harga()}").grid(row = i, column= 1)
+            tk.Label(self, text = jumlah).grid(row = i, column= 2)
+            i += 1
+
+        self.btn_exit = tk.Button(self, text = "EXIT", \
+                                  command = self.destroy).grid(row = i, column=1)
 
 
 class MainWindow(tk.Frame):
@@ -190,7 +197,8 @@ if __name__ == "__main__":
     buyer = Buyer()
 
     product_dict = {"Kebahagiaan" : Product("Kebahagiaan", 999999, 1),
-                    "Kunci TP3 SDA" : Product("Kunci TP3 SDA", 1000000, 660)}
+                    "Kunci TP3 SDA" : Product("Kunci TP3 SDA", 1000000, 660),
+                    "Perasaanmu" : Product("Perasaanmu", 12345, 100)}
 
     m = MainWindow(buyer, product_dict)
     m.master.title("BakungLapak")
