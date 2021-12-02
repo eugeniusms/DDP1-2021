@@ -96,17 +96,26 @@ class WindowBeliBarang(tk.Toplevel):
         # TODO: lengkapi method ini, yang merupakan event handler untuk
         # button BELI
         nama_barang = self.ent_nama_barang.get()
-        jumlah = int(self.ent_jumlah.get())
+        jumlah = self.ent_jumlah.get()
+        if jumlah.isdigit() and jumlah > 0:
+            jumlah = int(self.ent_jumlah)
+        elif not jumlah == "":
+            tkmsg.showinfo("Jumlah tidak valid!.", f"Jumlah harus bilangan bulat")
 
-        if nama_barang == "":
+
+        if nama_barang == "" and jumlah == "":
+            tkmsg.showinfo("Harap masukkan barang dan jumlah!", f"Maaf, anda belum memasukkan nama dan jumlah barang yang anda beli.")
+        elif nama_barang == "":
             # TODO : jika input barang merupakan string kosong
-            tkmsg.showinfo("Maaf, anda belum memasukkan nama barang yang anda beli.")
+            tkmsg.showinfo("Harap masukkan barang!", f"Maaf, anda belum memasukkan nama barang yang anda beli.")
+        elif jumlah == "":
+            tkmsg.showinfo("Harap masukkan jumlah!", f"Maaf, anda belum memasukkan jumlah barang yang anda beli.")
         elif nama_barang not in self.product_dict:
             # TODO : jika barang tidak ditemukan
-            tkmsg.showinfo("Barang dengan nama {nama_barang} tidak ditemukan dalam BakungLapak.")
+            tkmsg.showinfo("Barang tidak ditemukan!", f"Barang dengan nama {nama_barang} tidak ditemukan dalam BakungLapak.")
         elif self.product_dict[nama_barang].get_stok() - jumlah < 0:
             # TODO : jika stok habis
-            tkmsg.showinfo("Maaf, stok produk telah habis.")
+            tkmsg.showinfo("Stok habis!", f"Maaf, stok produk telah habis.")
         else :
             barang = self.product_dict[nama_barang]
             buyer.add_daftar_beli(barang, jumlah)
@@ -129,7 +138,7 @@ class WindowCheckOut(tk.Toplevel):
         self.lbl_nama = tk.Label(self, text = 'Nama Produk').grid(row = 1, column = 0)
         self.lbl_harga = tk.Label(self, text = 'Harga Barang').grid(row = 1, column = 1)
         self.lbl_stok = tk.Label(self, text = 'Jumlah').grid(row = 1, column = 2)
-        
+
         i = 2
         for barang, jumlah in self.daftar_dibeli.items():
             tk.Label(self, text = f"{barang.get_nama()}").grid(row = i, column= 0)
