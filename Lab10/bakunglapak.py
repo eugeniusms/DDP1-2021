@@ -45,8 +45,6 @@ class WindowLihatBarang(tk.Toplevel):
         super().__init__(master)
         self.product_dict = product_dict
         self.title("Daftar Barang")
-        self.geometry("200x200")
-        self.pack()
         self.create_widgets()
 
     def create_widgets(self):
@@ -72,14 +70,6 @@ class WindowLihatBarang(tk.Toplevel):
         self.btn_exit = tk.Button(self, text = "EXIT", \
                                   command = self.destroy).grid(row = i, column=1)
 
-        self.lbl_judul.pack()
-        self.lbl_nama.pack()
-        self.lbl_harga.pack()
-        self.lbl_stok.pack()
-        self.btn_exit.pack()
-        self.btn_exit.pack()
-
-
 class WindowBeliBarang(tk.Toplevel):
     def __init__(self, buyer, product_dict, master = None):
         super().__init__(master)
@@ -91,7 +81,22 @@ class WindowBeliBarang(tk.Toplevel):
 
     def create_widgets(self):
         # TODO: lengkapi method ini
-        pass
+        # self.ent_nama_barang = input('Nama Barang')
+        # self.ent_jumlah = int(input('Jumlah'))
+        self.lbl_form = tk.Label(self, \
+                                text = 'Form Beli Barang').grid(row = 0, column = 1)
+        self.lbl_barang = tk.Label(self, \
+                                text = 'Nama Barang').grid(row = 1, column = 0)
+        self.ent_nama_barang = tk.Entry(self, \
+                                width = 25).grid(row = 1, column = 1)
+        self.lbl_jumlah= tk.Label(self, \
+                                text = 'Jumlah').grid(row = 2, column = 0)
+        self.ent_jumlah = tk.Entry(self, \
+                                width = 25).grid(row = 2, column = 1)
+        self.btn_beli = tk.Button(self, \
+                                       text = "BELI").grid(row = 3, column = 1)
+        self.btn_exit = tk.Button(self, \
+                                  text = "EXIT").grid(row = 4, column = 1)
 
     def beli_barang(self):
         # TODO: lengkapi method ini, yang merupakan event handler untuk
