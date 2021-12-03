@@ -20,17 +20,35 @@ def create_bar(number, binary, canvas):
     canvas.create_text(175, 70, font = "Times 20 bold", text = "EAN-13 Barcode:")
 
     pos_x = 50
+    count = 0
     for bit in binary:
+        # For mark
         if bit == "1":
-            canvas.create_rectangle(
-                pos_x, 100, pos_x + 2.5, 250,
-                outline="#00C4FF",
-                fill="#00C4FF")
+            if (count < 3) or (count > 44 and count < 50) or (count > 90):
+                canvas.create_rectangle(
+                    pos_x, 100, pos_x + 1.5, 260,
+                    outline="#FF8141",
+                    fill="#FF8141")
+            else:
+                canvas.create_rectangle(
+                    pos_x, 100, pos_x + 1.5, 250,
+                    outline="#00C4FF",
+                    fill="#00C4FF")
         
         pos_x += 2.5
+        count += 1
+
+    style_number = ""
+    for i in range(len(number)):
+        if i == 0 or i == 6:
+            style_number += number[i] + "   "
+        else:
+            style_number += number[i] + "  "
+
+    canvas.create_text(155, 270, fill = "#1E5C9A", font = "Helvetica 17 bold", text = style_number)
 
     end = number[-1]
-    canvas.create_text(168, 310, fill = "#1E5C9A", font = "Times 20 bold", text = "Check Digit: {}".format(end))
+    canvas.create_text(168, 300, fill = "#1E5C9A", font = "Times 20 bold", text = "Check Digit: {}".format(end))
 
 
     # canvas.create_rectangle(
