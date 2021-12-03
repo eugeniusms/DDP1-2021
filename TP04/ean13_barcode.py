@@ -195,12 +195,24 @@ def main():
                 else:
                     end = end
 
+                # Pengecekan format file
+                invalid = 0
+                invalid_format = 0
+                if filename[-4:] != ".eps":
+                    tkmsg.showwarning("Invalid file format!", "Please enter valid file format.")
+                    invalid += 1
+                    invalid_format += 1
+
+                # Pengecekan nama kosong
+                if filename == "":
+                    invalid += 1
+
                 # Validasi nama file keluaran (huruf, angka, "-", "_", ".", " "<spasi>)
                 valid_char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_. "
-                invalid = 0
                 for char in filename:
                     if char not in valid_char:
                         invalid += 1
+
                 if invalid == 0:
                     # Melakukan penggambaran canvas saat tidak ditemukan error
                     processing(start, first_group, last_group, end, canvas)
@@ -208,7 +220,8 @@ def main():
                     canvas.postscript(file = filename, colormode='color')
                 else:
                     # Saat terdapat karakter invalid
-                    tkmsg.showwarning("Invalid name!", "Please enter valid input name.")
+                    if invalid_format == 0:
+                        tkmsg.showwarning("Invalid name!", "Please enter valid input name.")
 
             else:
                 # Saat input yang diberikan user ke dalam program tidak valid
