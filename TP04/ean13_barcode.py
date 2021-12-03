@@ -1,48 +1,85 @@
 from tkinter import *
+import tkinter.messagebox as tkmsg
 
 root = Tk()
 
-def create_bar(digit, ):
-    # Convert every digit to bar
-    canvas = Canvas(
-        root,
-        height=200,
-        width=200,
-        bg="#fff"
-        )
-        
-    canvas.pack()
-
-    canvas.create_rectangle(
-        30, 30, 40, 120,
-        outline="#fb0",
-        fill="#fb0")
-    canvas.create_rectangle(
-        40, 30, 50, 120,
-        outline="#fb0",
-        fill="#ff0000")
+def manipulate(binary):
+    # Len binary => 7 * 12 = 84
+    # Manipulasi string index = 0, 41, 84
+    strend = "101"
+    mid = "01010"
     
-def processing(start, first_group, middle, last_group, end):
+    new_binary = strend + binary[:42] + mid + binary[42:] + strend
+    return new_binary
+
+
+def create_bar(number, binary, canvas):
+    # Convert every digit to bar
+    binary = manipulate(binary)
+
+    canvas.create_text(175, 70, font = "Times 20 bold", text = "EAN-13 Barcode:")
+
+    pos_x = 50
+    for bit in binary:
+        if bit == "1":
+            canvas.create_rectangle(
+                pos_x, 100, pos_x + 2.5, 250,
+                outline="#00C4FF",
+                fill="#00C4FF")
+        
+        pos_x += 2.5
+
+    end = number[-1]
+    canvas.create_text(168, 310, fill = "#1E5C9A", font = "Times 20 bold", text = "Check Digit: {}".format(end))
+
+
+    # canvas.create_rectangle(
+    #     pos_x, 30, pos_x+10, 120,
+    #     outline="#fb0",
+    #     fill="#fb0")
+    
+def processing(start, first_group, last_group, end, canvas):
+    print(start, first_group, last_group, end)
+
+    # Penentuan struktur dipengaruhi oleh digit pertama (start)
     first_structure = {
-        0 : "LLLLLL",
-        1 : "LLGLGG",
-        2 : "LLGGLG",
-        3 : "LLGGGL",
-        4 : "LGLLGG",
-        5 : "LGGLLG",
-        6 : "LGGGLL",
-        7 : "LGLGLG",
-        8 : "LGLGGL",
-        9 : "LGGLGL"
+        "0" : "LLLLLL",
+        "1" : "LLGLGG",
+        "2" : "LLGGLG",
+        "3" : "LLGGGL",
+        "4" : "LGLLGG",
+        "5" : "LGGLLG",
+        "6" : "LGGGLL",
+        "7" : "LGLGLG",
+        "8" : "LGLGGL",
+        "9" : "LGGLGL"
     }
+
+    structure = first_structure[start] + "RRRRRR"
+    print(structure)
+    number = first_group + last_group + str(end)
+    print(number)
+
     digit_encoding = {
         "L" : ["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"],
         "G" : ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"],
         "R" : ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1001000"]
     }
 
+    binary = ""
+    count = 0
+    for lgr in structure:
+        num = number[count]
+        cod = digit_encoding[lgr]
+        binary += cod[int(num)]
+        count += 1
+
+    print(binary)
+
+    create_bar(number, binary, canvas)
+
 def main():
-    root.geometry("465x560")
+    root.geometry("450x540")
     welcome = Label(root, text = 'Save barcode to PS file [eg: EAN13.eps]:')
     save = Entry(root, width = 25)
     enter = Label(root, text = 'Enter code (first 12 decimal digits):')
@@ -53,13 +90,43 @@ def main():
     enter.place(x = 108, y = 70)
     code.place(x = 100, y = 100)
 
-    # disp_tf = Entry(root, font=('Arial', 14))
-    # disp_tf.insert(0, "HAI")
-    # disp_tf.place(x = 30, y = 140, width = 400, height = 400)
-    check_number = code.get()
-    
-    check = Label(root, text = check_number)
-    check.pack()
+    canvas = Canvas(
+        root,
+        height=350,
+        width=350,
+        bg="#fff"
+        )
+    canvas.place(x = 43, y = 140)
+
+    def func(event):
+        check_number = code.get()
+
+        # Validasi angka harusnya 12 digit panjangnya
+        if len(check_number) == 12:
+            start = check_number[0]
+            first_group = check_number[1:7]
+            last_group = check_number[7:13]
+            
+            # end bertindak sebagai check digit
+            end = 0
+            for digit in range(len(check_number)):
+                if digit % 2:
+                    end += 3 * int(check_number[digit])
+                else:
+                    end += 1 * int(check_number[digit])
+            end %= 10
+            if end != 0:
+                end = 10 - end
+            else:
+                end = end
+
+            print(f"end : {end}")
+            processing(start, first_group, last_group, end, canvas)
+
+        else:
+            tkmsg.showwarning("Wrong input!", "Please enter correct input code.")
+
+    root.bind('<Return>', func)
 
 
 if __name__ == "__main__":
