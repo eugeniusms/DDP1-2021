@@ -13,11 +13,11 @@ def manipulate(binary):
     return new_binary
 
 
-def create_bar(number, binary, canvas):
+def create_bar(start, number, binary, canvas):
     # Convert every digit to bar
     binary = manipulate(binary)
 
-    canvas.create_text(175, 70, font = "Times 20 bold", text = "EAN-13 Barcode:")
+    canvas.create_text(175, 75, font = "Helvetica 20 bold", text = "EAN-13 Barcode:")
 
     pos_x = 50
     count = 0
@@ -39,16 +39,17 @@ def create_bar(number, binary, canvas):
         count += 1
 
     style_number = ""
+    number = start + number
     for i in range(len(number)):
         if i == 0 or i == 6:
             style_number += number[i] + "   "
         else:
             style_number += number[i] + "  "
 
-    canvas.create_text(155, 270, fill = "#1E5C9A", font = "Helvetica 17 bold", text = style_number)
+    canvas.create_text(165, 271, fill = "#1E5C9A", font = "Helvetica 17 bold", text = style_number)
 
     end = number[-1]
-    canvas.create_text(168, 300, fill = "#1E5C9A", font = "Times 20 bold", text = "Check Digit: {}".format(end))
+    canvas.create_text(168, 295, font = "Helvetica 20 bold", text = "Check Digit: {}".format(end))
 
 
     # canvas.create_rectangle(
@@ -94,7 +95,7 @@ def processing(start, first_group, last_group, end, canvas):
 
     print(binary)
 
-    create_bar(number, binary, canvas)
+    create_bar(start, number, binary, canvas)
 
 def main():
     root.geometry("450x540")
@@ -118,6 +119,7 @@ def main():
 
     def func(event):
         check_number = code.get()
+        filename = save.get()
 
         # Validasi angka harusnya 12 digit panjangnya
         if len(check_number) == 12:
@@ -140,6 +142,9 @@ def main():
 
             print(f"end : {end}")
             processing(start, first_group, last_group, end, canvas)
+
+            # Proses menyimpan
+            canvas.postscript(file = filename, colormode='color')
 
         else:
             tkmsg.showwarning("Wrong input!", "Please enter correct input code.")
